@@ -8,7 +8,7 @@ import (
 
 func TestMagisterGo(t *testing.T) {
 	godotenv.Load()
-	magister, _ := NewMagister(os.Getenv("SCHOOL"), os.Getenv("USERNAME"), os.Getenv("PASSWORD"))
+	t.Log("Initializing Magister object")
+	_, _ = NewMagister(os.Getenv("SCHOOL"), os.Getenv("USERNAME"), os.Getenv("PASSWORD"))
 
-	t.Logf("%+v\n", magister.Endpoints)
 }
