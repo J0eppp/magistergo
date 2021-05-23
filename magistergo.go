@@ -1,38 +1,15 @@
 package magistergo
 
 import (
+	"crypto/tls"
 	"encoding/json"
+	client "github.com/bozd4g/go-http-client"
 	"io/ioutil"
 	"log"
-	"magistergo/types"
 	"net/http"
-	"net/http/cookiejar"
 	"strings"
 	"time"
 )
-
-type Magister_I interface {
-
-}
-
-type Magister struct {
-	School string
-	Username string
-	Password string
-	Hostname string
-	Authority string
-	ClientID string
-	RedirectURI string
-	Scope string
-	ResponseType string
-	ACRValues string // Idk what this is
-	DefaultState string
-	DefaultNonce string
-	AuthCode string
-	Endpoints types.Endpoints
-	HTTPClient http.Client
-	//CookieJar *cookiejar.Jar
-}
 
 func NewMagister(school string, username string, password string) (Magister, error) {
 	var magister Magister
@@ -40,24 +17,20 @@ func NewMagister(school string, username string, password string) (Magister, err
 	magister.Username = username
 	magister.Password = password
 
-	magister.Hostname = "https://" + strings.ToLower(magister.School) + ".magister.net/"
+	magister.Tenant = strings.ToLower(magister.School) + ".magister.net"
 
 	magister.Authority = "https://accounts.magister.net"
 
-	jar, err := cookiejar.New(&cookiejar.Options{})
-	if err != nil {
-		return magister, err
-	}
-	//magister.CookieJar = jar
-
 	magister.HTTPClient = http.Client{
 		Timeout: time.Second * 10,
-		Jar: jar,
+		//Jar: jar,
+		Transport: &http.Transport{
+			TLSNextProto: make(map[string]func(authority string, c *tls.Conn) http.RoundTripper),
+		},
 	}
 
-
 	// Get the endpoints
-	err = func() error {
+	err := func() error {
 		endpointsUrl := magister.Authority + "/.well-known/openid-configuration"
 		res, err := http.Get(endpointsUrl)
 		defer res.Body.Close()
@@ -81,28 +54,46 @@ func NewMagister(school string, username string, password string) (Magister, err
 		return magister, err
 	}
 
-	magister.ClientID = "M6-" + magister.Hostname
-	magister.RedirectURI = magister.Hostname + "/oid/redirect_callback.html"
+	magister.ClientID = "M6-" + magister.Tenant
+	magister.RedirectURI = "https://" + magister.Tenant + "/oid/redirect_callback.html"
 	magister.Scope = "openid profile"
 	magister.ResponseType = "id_token token"
-	magister.ACRValues = "tenant:" + magister.Hostname
+	magister.ACRValues = "tenant:" + magister.Tenant
 	magister.DefaultState = "00000000000000000000000000000000"
 	magister.DefaultNonce = "00000000000000000000000000000000"
 
 
 	// Get the cookies
 	err = func() error {
-		url := magister.Endpoints.AuthorizationEndpoint + "?client_id=" + magister.ClientID + "&redirect_uri=" + magister.RedirectURI + "&response_type=" + magister.ResponseType + "&scope=" + magister.Scope + "&acr_values=" + magister.ACRValues + "&state=" + magister.DefaultState + "&nonce=" + magister.DefaultNonce
-		res, err := magister.HTTPClient.Get(url)
+		url := magister.Endpoints.AuthorizationEndpoint + "?client_id=M6LOAPP" /*+ magister.ClientID*/ + "&redirect_uri=" + magister.RedirectURI + "&response_type=" + magister.ResponseType + "&scope=" + magister.Scope + "&acr_values=" + magister.ACRValues + "&state=" + magister.DefaultState + "&nonce=" + magister.DefaultNonce
+		//url := "http://localhost:3000/connect/authorize" + "?client_id=" + magister.ClientID + "&redirect_uri=" + magister.RedirectURI + "&response_type=" + magister.ResponseType + "&scope=" + magister.Scope + "&acr_values=" + magister.ACRValues + "&state=" + magister.DefaultState + "&nonce=" + magister.DefaultNonce
+		log.Printf(url)
+		httpClient := client.New(url)
+		request, err := httpClient.Get("")
 		if err != nil {
 			return err
 		}
-		defer res.Body.Close()
-		//log.Println(res.Request.URL.String())
 
-		resBytes, err := ioutil.ReadAll(res.Body)
-		log.Println(string(resBytes))
-		log.Printf("%+v\n", res)
+		response, err := httpClient.Do(request)
+		if err != nil {
+			return err
+		}
+
+		log.Println(response.Get().Status)
+		log.Println(response.Get().Header)
+		log.Println(string(response.Get().Body))
+		//log.Printf("%+v\n", response)
+		//log.Println(url)
+		//res, err := magister.HTTPClient.Get(url)
+		//if err != nil {
+		//	return err
+		//}
+		//defer res.Body.Close()
+		////log.Println(res.Request.URL.String())
+		//
+		//resBytes, err := ioutil.ReadAll(res.Body)
+		//log.Println(string(resBytes))
+		//log.Printf("%+v\n", res)
 
 		return nil
 	}()

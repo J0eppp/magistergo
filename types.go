@@ -1,4 +1,31 @@
-package types
+package magistergo
+
+import (
+	"net/http"
+)
+
+type Magister_I interface {
+
+}
+
+type Magister struct {
+	School string
+	Username string
+	Password string
+	Tenant string
+	Authority string
+	ClientID string
+	RedirectURI string
+	Scope string
+	ResponseType string
+	ACRValues string // Idk what this is
+	DefaultState string
+	DefaultNonce string
+	AuthCode string
+	Endpoints Endpoints
+	HTTPClient http.Client
+	//CookieJar *cookiejar.Jar
+}
 
 // Endpoints contains all the information about the Magister endpoints (I guess)
 type Endpoints struct {
@@ -25,4 +52,9 @@ type Endpoints struct {
 	CodeChallengeMethodsSupported      [2]string  `json:"code_challenge_methods_supported"`
 	RequestParameterSupported          bool       `json:"request_parameter_supported"`
 	TenantsEndpoint                    string     `json:"tenants_endpoint"`
+}
+
+type LoginOptions struct {
+	Username string
+	Password string
 }
