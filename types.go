@@ -1,31 +1,39 @@
 package magistergo
 
-import (
-	"net/http"
-)
+import "net/http"
 
 type Magister_I interface {
 
 }
 
 type Magister struct {
-	School string
-	Username string
-	Password string
 	Tenant string
+	AccessToken string
+	RefreshToken string
+	AccessTokenExpiresAt int64
 	Authority string
-	ClientID string
-	RedirectURI string
-	Scope string
-	ResponseType string
-	ACRValues string // Idk what this is
-	DefaultState string
-	DefaultNonce string
-	AuthCode string
 	Endpoints Endpoints
 	HTTPClient http.Client
-	//CookieJar *cookiejar.Jar
 }
+
+//type Magister struct {
+//	School string
+//	Username string
+//	Password string
+//	Tenant string
+//	Authority string
+//	ClientID string
+//	RedirectURI string
+//	Scope string
+//	ResponseType string
+//	ACRValues string // Idk what this is
+//	DefaultState string
+//	DefaultNonce string
+//	AuthCode string
+//	Endpoints Endpoints
+//	HTTPClient http.Client
+//	//CookieJar *cookiejar.Jar
+//}
 
 // Endpoints contains all the information about the Magister endpoints (I guess)
 type Endpoints struct {
@@ -57,4 +65,11 @@ type Endpoints struct {
 type LoginOptions struct {
 	Username string
 	Password string
+}
+
+type RefreshAccessTokenResponse struct {
+	AccessToken string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+	expiresIn int64 `json:"expires_in"`
+	ExpiresAt int64
 }
