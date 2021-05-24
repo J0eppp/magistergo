@@ -25,5 +25,18 @@ func TestMagisterGo(t *testing.T) {
 		t.Error(err.Error())
 	}
 
+	os.Setenv("ACCESSTOKEN", res.AccessToken)
+	os.Setenv("REFRESHTOKEN", res.RefreshToken)
+	os.Setenv("EXPIRES", strconv.Itoa(int(res.ExpiresAt)))
+
+	envMap, err := godotenv.Read(".env")
+	envMap["ACCESSTOKEN"] = res.AccessToken
+	envMap["REFRESHTOKEN"] = res.RefreshToken
+	envMap["EXPIRES"] = strconv.Itoa(int(res.ExpiresAt))
+
+
+	godotenv.Write(envMap, ".env")
+
+
 	t.Logf("%+v\n", res)
 }
