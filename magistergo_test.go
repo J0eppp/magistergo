@@ -1,26 +1,33 @@
 package magistergo
 
 import (
-	"fmt"
-	"github.com/joho/godotenv"
-	"os"
-	"strconv"
 	"testing"
 )
 
 func TestMagisterGo(t *testing.T) {
-	// Get data from .env file
-	godotenv.Load(".env")
-	accessToken := os.Getenv("ACCESSTOKEN")
-	refreshToken := os.Getenv("REFRESHTOKEN")
-	accessTokenExpires, _ := strconv.ParseInt(os.Getenv("EXPIRES"), 10, 64)
-	tenant := os.Getenv("TENANT")
+	//// Get data from .env file
+	//err := godotenv.Load(".env")
+	//if err != nil {
+	//	t.Failed()
+	//	t.Error(err.Error())
+	//}
+
+	//accessToken := os.Getenv("ENV_ACCESS_TOKEN")
+	//refreshToken := os.Getenv("REFRESH_TOKEN")
+	//accessTokenExpires, _ := strconv.ParseInt(os.Getenv("EXPIRES"), 10, 64)
+	//tenant := os.Getenv("TENANT")
+
+	accessToken := ENV_ACCESS_TOKEN
+	refreshToken := ENV_REFRESH_TOKEN
+	accessTokenExpires := ENV_EXPIRES
+	tenant := ENV_TENANT
+
 
 	// Create a Magister instance, give it all the data it needs
 	magister, err := NewMagister(accessToken, refreshToken, accessTokenExpires, tenant)
 	if err != nil {
-		fmt.Println(err)
-		return
+		t.Failed()
+		t.Error(err.Error())
 	}
 
 	_, err = magister.GetAppointments()

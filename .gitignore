@@ -23,3 +23,5 @@
 # Script that gets the tokens from magister
 magister.js
 node_modules
+
+PRIVATE_*

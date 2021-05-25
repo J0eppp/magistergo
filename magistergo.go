@@ -2,9 +2,9 @@ package magistergo
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -57,6 +57,7 @@ func NewMagister(accessToken string, refreshToken string, accessTokenExpiresAt i
 			return err
 		}
 		var user AccountData
+		log.Println(magister.Tenant)
 		url := "https://" + magister.Tenant + "/api/account?noCache=0"
 
 		r, err := http.NewRequest(http.MethodGet, url, nil) // URL-encoded payload
@@ -91,9 +92,9 @@ func NewMagister(accessToken string, refreshToken string, accessTokenExpiresAt i
 
 // CheckSession checks if the session has expired
 func (magister *Magister) CheckSession() error {
-	if magister.AccessTokenExpiresAt < time.Now().Unix() {
-		return errors.New("your access token has expired")
-	}
+	//if time.Now().Unix() > magister.AccessTokenExpiresAt {
+	//	return errors.New("your access token has expired")
+	//}
 
 	return nil
 }
