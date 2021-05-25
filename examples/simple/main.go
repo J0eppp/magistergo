@@ -1,35 +1,3 @@
-# magistergo
-A go implementation of the Magister 6 API
-
-# Usage
-## Get the tokens using an external library
-Get the session token and refresh token using another library (e.g. [magister-scraper](https://github.com/JipFr/magister-scraper/))
-```javascript
-const { AuthManager } = require("magister-openid");
-const axios = require("axios");
-
-const options = {
-    tenant: "school.magister.net",
-    username: "<username>",
-    password: "<password>"
-}
-
-const manager = new AuthManager(options.tenant);
-
-axios("https://argo-web.vercel.app/api/authCode").then(({ data: authCode }) => {
-    manager.login(options.username, options.password, authCode).then(tokens => {
-        console.log("ACCESSTOKEN=" + tokens.access_token);
-        console.log("REFRESHTOKEN=" + tokens.refresh_token);
-        console.log("EXPIRES=" + tokens.expires_at);
-        console.log("TENANT=" + options.tenant);
-    });
-});
-```
-
-<b>*Note: this library is not able to get the access and refresh token by itself (yet), however it is able to refresh the access token with the refresh token.*</b> 
-
-## Use the library
-```go
 package main
 
 import (
@@ -100,7 +68,3 @@ func main() {
 		fmt.Printf("%+v\n", message)
 	}
 }
-```
-
-## Examples
-Find examples in the [examples folder](https://github.com/J0eppp/magistergo/tree/master/examples)

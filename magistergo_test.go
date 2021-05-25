@@ -38,14 +38,28 @@ func TestMagisterGo(t *testing.T) {
 
 	godotenv.Write(envMap, ".env")
 
-
-	//t.Logf("%+v\n", res)
-
-	appointments, err := magister.GetAppointments()
+	_, err = magister.GetAppointments()
 	if err != nil {
 		t.Failed()
 		t.Error(err.Error())
 	}
 
-	t.Logf("%+v\n", appointments[0])
+	// Get today's appointments
+	_, err = magister.GetAppointments("2021-05-25", "2021-05-25")
+	if err != nil {
+		t.Failed()
+		t.Error(err.Error())
+	}
+
+	// Get messages
+	messages, err := magister.GetMessages(7)
+	if err != nil {
+		t.Failed()
+		t.Error(err)
+	}
+
+	for _, message := range messages {
+		t.Logf("%+v\n", message)
+	}
 }
+

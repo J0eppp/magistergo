@@ -13,8 +13,6 @@ import (
 func NewMagister(accessToken string, refreshToken string, accessTokenExpiresAt int64, tenant string) (Magister, error) {
 	var magister Magister
 
-	//magister.ClientID = "M6-" + tenant
-
 	magister.Authority = "https://accounts.magister.net"
 	magister.HTTPClient = http.Client{
 		Timeout: time.Second * 10,
@@ -69,9 +67,6 @@ func NewMagister(accessToken string, refreshToken string, accessTokenExpiresAt i
 
 		defer resp.Body.Close()
 
-		//body, err := ioutil.ReadAll(resp.Body)
-		//log.Println(string(body))
-
 		err = json.NewDecoder(resp.Body).Decode(&user)
 		if err != nil {
 			return err
@@ -103,7 +98,6 @@ func (magister *Magister) RefreshAccessToken() (RefreshAccessTokenResponse, erro
 	}
 
 	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	//r.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
 
 	resp, err := magister.HTTPClient.Do(r)
 	if err != nil {
@@ -113,7 +107,6 @@ func (magister *Magister) RefreshAccessToken() (RefreshAccessTokenResponse, erro
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
-	//log.Println(string(body))
 
 	err = json.Unmarshal(body, &response)
 	if err != nil {
@@ -123,40 +116,4 @@ func (magister *Magister) RefreshAccessToken() (RefreshAccessTokenResponse, erro
 	response.ExpiresAt = time.Now().Unix() + response.expiresIn
 
 	return response, nil
-}
-
-func (magister *Magister) GetAppointments() ([]Appointment, error) {
-	var appointments []Appointment
-
-	url := "https://" + magister.Tenant + "/api/personen/" + magister.UserID + "/afspraken"
-
-	r, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return appointments, err
-	}
-
-	r.Header.Add("authorization", "Bearer " + magister.AccessToken)
-
-	resp, err := magister.HTTPClient.Do(r)
-	if err != nil {
-		return appointments, err
-	}
-
-	defer resp.Body.Close()
-
-	//body, err := ioutil.ReadAll(resp.Body)
-	//log.Println(string(body))
-
-	temp := struct{
-		Items []Appointment `json:"Items"`
-	}{}
-
-	err = json.NewDecoder(resp.Body).Decode(&temp)
-	if err != nil {
-		return appointments, err
-	}
-
-	appointments = temp.Items
-
-	return appointments, nil
 }
