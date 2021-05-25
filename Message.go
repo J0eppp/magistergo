@@ -8,7 +8,7 @@ import (
 )
 
 type MessageInfo struct {
-	ID        int    `json:"id"`
+	ID        int64  `json:"id"`
 	Subject	  string `json:"onderwerp"`
 	MapID     int    `json:"mapId"`
 	Sender    struct {
@@ -39,6 +39,10 @@ type MessageInfo struct {
 func (magister *Magister) GetMessages(amountOfMessages uint64, skip... uint64) ([]MessageInfo, error) {
 	var messages []MessageInfo
 	var skipMessages uint64
+
+	if err := magister.CheckSession(); err != nil {
+		return messages, err
+	}
 
 	if len(skip) == 0 {
 		skipMessages = 0
@@ -120,4 +124,35 @@ type Message struct {
 			Href string `json:"href"`
 		} `json:"bijlagen"`
 	} `json:"links"`
+}
+
+func (magister *Magister) GetMessage(messageID int64) (Message, error) {
+	var message Message
+
+	if err := magister.CheckSession(); err != nil {
+		return message, err
+	}
+
+	url := "https://" + magister.Tenant + "/api/berichten/berichten/" + strconv.FormatInt(messageID, 10)
+
+	r, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return message, err
+	}
+
+	r.Header.Add("authorization", "Bearer " + magister.AccessToken)
+
+	resp, err := magister.HTTPClient.Do(r)
+	if err != nil {
+		return message, err
+	}
+
+	defer resp.Body.Close()
+
+	err = json.NewDecoder(resp.Body).Decode(&message)
+	if err != nil {
+		return message, err
+	}
+
+	return message, nil
 }

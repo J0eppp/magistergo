@@ -114,6 +114,11 @@ func (appointment *Appointment) GetStatus() string {
 
 func (magister *Magister) GetAppointments(dates... string) ([]Appointment, error) {
 	var appointments []Appointment
+
+	if err := magister.CheckSession(); err != nil {
+		return appointments, err
+	}
+
 	var url string
 	if len(dates) == 2 {
 		url = "https://" + magister.Tenant + "/api/personen/" + magister.UserID + "/afspraken?status=1&tot=" + dates[1] + "&van=" + dates[0]

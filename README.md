@@ -55,28 +55,6 @@ func main() {
 		return
 	}
 
-	// Refresh the access token
-	res, err := magister.RefreshAccessToken()
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	// Safe the new access and refresh token to the .env file
-	os.Setenv("ACCESSTOKEN", res.AccessToken)
-	os.Setenv("REFRESHTOKEN", res.RefreshToken)
-	os.Setenv("EXPIRES", strconv.Itoa(int(res.ExpiresAt)))
-
-	envMap, err := godotenv.Read(".env")
-	envMap["ACCESSTOKEN"] = res.AccessToken
-	envMap["REFRESHTOKEN"] = res.RefreshToken
-	envMap["EXPIRES"] = strconv.Itoa(int(res.ExpiresAt))
-	envMap["TENANT"] = tenant
-
-
-	godotenv.Write(envMap, ".env")
-
-	// Get appointments
 	_, err = magister.GetAppointments()
 	if err != nil {
 		fmt.Println(err)
@@ -97,10 +75,19 @@ func main() {
 		return
 	}
 
-	// Print 7 messages
 	for _, message := range messages {
 		fmt.Printf("%+v\n", message)
 	}
+
+	// Get the content of the last received message
+	msgID := messages[0].ID
+	message, err := magister.GetMessage(msgID)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Println(message.Content)
 }
 ```
 

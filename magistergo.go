@@ -2,6 +2,8 @@ package magistergo
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -25,6 +27,7 @@ func NewMagister(accessToken string, refreshToken string, accessTokenExpiresAt i
 			defer res.Body.Close()
 
 			if err != nil {
+				fmt.Errorf(err.Error())
 				return err
 			}
 
@@ -50,6 +53,9 @@ func NewMagister(accessToken string, refreshToken string, accessTokenExpiresAt i
 
 	// Get AccountData
 	err = func() error {
+		if err := magister.CheckSession(); err != nil {
+			return err
+		}
 		var user AccountData
 		url := "https://" + magister.Tenant + "/api/account?noCache=0"
 
@@ -83,9 +89,21 @@ func NewMagister(accessToken string, refreshToken string, accessTokenExpiresAt i
 	return magister, nil
 }
 
+// CheckSession checks if the session has expired
+func (magister *Magister) CheckSession() error {
+	if magister.AccessTokenExpiresAt < time.Now().Unix() {
+		return errors.New("your access token has expired")
+	}
+
+	return nil
+}
+
 // RefreshAccessToken refreshes the access token
 func (magister *Magister) RefreshAccessToken() (RefreshAccessTokenResponse, error) {
 	var response RefreshAccessTokenResponse
+	if err := magister.CheckSession(); err != nil {
+		return response, err
+	}
 
 	data := url.Values{}
 	data.Set("refresh_token", magister.RefreshToken)
