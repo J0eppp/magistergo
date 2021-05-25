@@ -13,7 +13,17 @@ type Magister struct {
 	AccessTokenExpiresAt int64
 	Authority string
 	Endpoints Endpoints
+	//ClientID string
+	UserID string
 	HTTPClient http.Client
+}
+
+type Persoon struct {
+	Id int64 `json:"Id"`
+}
+
+type AccountData struct {
+	Persoon Persoon `json:"Persoon"`
 }
 
 //type Magister struct {

@@ -33,10 +33,19 @@ func TestMagisterGo(t *testing.T) {
 	envMap["ACCESSTOKEN"] = res.AccessToken
 	envMap["REFRESHTOKEN"] = res.RefreshToken
 	envMap["EXPIRES"] = strconv.Itoa(int(res.ExpiresAt))
+	envMap["TENANT"] = tenant
 
 
 	godotenv.Write(envMap, ".env")
 
 
-	t.Logf("%+v\n", res)
+	//t.Logf("%+v\n", res)
+
+	appointments, err := magister.GetAppointments()
+	if err != nil {
+		t.Failed()
+		t.Error(err.Error())
+	}
+
+	t.Logf("%+v\n", appointments[0])
 }
