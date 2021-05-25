@@ -15,6 +15,8 @@ func main() {
 	refreshToken := os.Getenv("REFRESHTOKEN")
 	accessTokenExpires, _ := strconv.ParseInt(os.Getenv("EXPIRES"), 10, 64)
 	tenant := os.Getenv("TENANT")
+
+	// Create a Magister instance, give it all the data it needs
 	magister, err := magistergo.NewMagister(accessToken, refreshToken, accessTokenExpires, tenant)
 	if err != nil {
 		fmt.Println(err)
