@@ -103,4 +103,4 @@ func main() {
 ```
 
 ## Examples
-Find examples in the [examples folder](https://github.com/J0eppp/magistergo/tree/master/examples)
+Find examples in the [examples folder](https://github.com/J0eppp/magistergo/tree/main/examples)
