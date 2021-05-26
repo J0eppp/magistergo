@@ -112,18 +112,18 @@ func (appointment *Appointment) GetStatus() string {
 	}
 }
 
-func (magister *Magister) GetAppointments(dates... string) ([]Appointment, error) {
+func (m *Magister) GetAppointments(dates... string) ([]Appointment, error) {
 	var appointments []Appointment
 
-	if err := magister.CheckSession(); err != nil {
+	if err := m.CheckSession(); err != nil {
 		return appointments, err
 	}
 
 	var url string
 	if len(dates) == 2 {
-		url = "https://" + magister.Tenant + "/api/personen/" + magister.UserID + "/afspraken?status=1&tot=" + dates[1] + "&van=" + dates[0]
+		url = "https://" + m.Tenant + "/api/personen/" + m.UserID + "/afspraken?status=1&tot=" + dates[1] + "&van=" + dates[0]
 	} else {
-		url = "https://" + magister.Tenant + "/api/personen/" + magister.UserID + "/afspraken"
+		url = "https://" + m.Tenant + "/api/personen/" + m.UserID + "/afspraken"
 	}
 
 
@@ -132,9 +132,9 @@ func (magister *Magister) GetAppointments(dates... string) ([]Appointment, error
 		return appointments, err
 	}
 
-	r.Header.Add("authorization", "Bearer " + magister.AccessToken)
+	r.Header.Add("authorization", "Bearer " + m.AccessToken)
 
-	resp, err := magister.HTTPClient.Do(r)
+	resp, err := m.HTTPClient.Do(r)
 	if err != nil {
 		return appointments, err
 	}

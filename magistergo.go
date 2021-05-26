@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -57,7 +56,6 @@ func NewMagister(accessToken string, refreshToken string, accessTokenExpiresAt i
 			return err
 		}
 		var user AccountData
-		log.Println(magister.Tenant)
 		url := "https://" + magister.Tenant + "/api/account?noCache=0"
 
 		r, err := http.NewRequest(http.MethodGet, url, nil) // URL-encoded payload
@@ -91,8 +89,8 @@ func NewMagister(accessToken string, refreshToken string, accessTokenExpiresAt i
 }
 
 // CheckSession checks if the session has expired
-func (magister *Magister) CheckSession() error {
-	//if time.Now().Unix() > magister.AccessTokenExpiresAt {
+func (m *Magister) CheckSession() error {
+	//if time.Now().Unix() > m.AccessTokenExpiresAt {
 	//	return errors.New("your access token has expired")
 	//}
 
@@ -100,25 +98,25 @@ func (magister *Magister) CheckSession() error {
 }
 
 // RefreshAccessToken refreshes the access token
-func (magister *Magister) RefreshAccessToken() (RefreshAccessTokenResponse, error) {
+func (m *Magister) RefreshAccessToken() (RefreshAccessTokenResponse, error) {
 	var response RefreshAccessTokenResponse
-	if err := magister.CheckSession(); err != nil {
+	if err := m.CheckSession(); err != nil {
 		return response, err
 	}
 
 	data := url.Values{}
-	data.Set("refresh_token", magister.RefreshToken)
+	data.Set("refresh_token", m.RefreshToken)
 	data.Set("client_id", "M6LOAPP")
 	data.Set("grant_type", "refresh_token")
 
-	r, err := http.NewRequest(http.MethodPost, magister.Endpoints.TokenEndpoint, strings.NewReader(data.Encode())) // URL-encoded payload
+	r, err := http.NewRequest(http.MethodPost, m.Endpoints.TokenEndpoint, strings.NewReader(data.Encode())) // URL-encoded payload
 	if err != nil {
 		return response, err
 	}
 
 	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
-	resp, err := magister.HTTPClient.Do(r)
+	resp, err := m.HTTPClient.Do(r)
 	if err != nil {
 		return response, err
 	}

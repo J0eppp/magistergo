@@ -36,11 +36,11 @@ type MessageInfo struct {
 	} `json:"links"`
 }
 
-func (magister *Magister) GetMessages(amountOfMessages uint64, skip... uint64) ([]MessageInfo, error) {
+func (m *Magister) GetMessages(amountOfMessages uint64, skip... uint64) ([]MessageInfo, error) {
 	var messages []MessageInfo
 	var skipMessages uint64
 
-	if err := magister.CheckSession(); err != nil {
+	if err := m.CheckSession(); err != nil {
 		return messages, err
 	}
 
@@ -50,16 +50,16 @@ func (magister *Magister) GetMessages(amountOfMessages uint64, skip... uint64) (
 		skipMessages = skip[0]
 	}
 
-	url := "https://" + magister.Tenant + "/api/berichten/postvakin/berichten?top=" + strconv.FormatUint(amountOfMessages + skipMessages, 10) + "&skip=" + strconv.FormatUint(skipMessages, 10)
+	url := "https://" + m.Tenant + "/api/berichten/postvakin/berichten?top=" + strconv.FormatUint(amountOfMessages + skipMessages, 10) + "&skip=" + strconv.FormatUint(skipMessages, 10)
 
 	r, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return messages, err
 	}
 
-	r.Header.Add("authorization", "Bearer " + magister.AccessToken)
+	r.Header.Add("authorization", "Bearer " + m.AccessToken)
 
-	resp, err := magister.HTTPClient.Do(r)
+	resp, err := m.HTTPClient.Do(r)
 	if err != nil {
 		return messages, err
 	}
@@ -126,23 +126,23 @@ type Message struct {
 	} `json:"links"`
 }
 
-func (magister *Magister) GetMessage(messageID int64) (Message, error) {
+func (m *Magister) GetMessage(messageID int64) (Message, error) {
 	var message Message
 
-	if err := magister.CheckSession(); err != nil {
+	if err := m.CheckSession(); err != nil {
 		return message, err
 	}
 
-	url := "https://" + magister.Tenant + "/api/berichten/berichten/" + strconv.FormatInt(messageID, 10)
+	url := "https://" + m.Tenant + "/api/berichten/berichten/" + strconv.FormatInt(messageID, 10)
 
 	r, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return message, err
 	}
 
-	r.Header.Add("authorization", "Bearer " + magister.AccessToken)
+	r.Header.Add("authorization", "Bearer " + m.AccessToken)
 
-	resp, err := magister.HTTPClient.Do(r)
+	resp, err := m.HTTPClient.Do(r)
 	if err != nil {
 		return message, err
 	}

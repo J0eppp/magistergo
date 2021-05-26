@@ -1,27 +1,24 @@
 package magistergo
 
 import (
+	"github.com/joho/godotenv"
+	"os"
+	"strconv"
 	"testing"
 )
 
 func TestMagisterGo(t *testing.T) {
-	//// Get data from .env file
-	//err := godotenv.Load(".env")
-	//if err != nil {
-	//	t.Failed()
-	//	t.Error(err.Error())
-	//}
+	// Get data from .env file
+	err := godotenv.Load(".env")
+	if err != nil {
+		t.Failed()
+		t.Error(err.Error())
+	}
 
-	//accessToken := os.Getenv("ENV_ACCESS_TOKEN")
-	//refreshToken := os.Getenv("REFRESH_TOKEN")
-	//accessTokenExpires, _ := strconv.ParseInt(os.Getenv("EXPIRES"), 10, 64)
-	//tenant := os.Getenv("TENANT")
-
-	accessToken := ENV_ACCESS_TOKEN
-	refreshToken := ENV_REFRESH_TOKEN
-	accessTokenExpires := ENV_EXPIRES
-	tenant := ENV_TENANT
-
+	accessToken := os.Getenv("ACCESS_TOKEN")
+	refreshToken := os.Getenv("REFRESH_TOKEN")
+	accessTokenExpires, _ := strconv.ParseInt(os.Getenv("EXPIRES"), 10, 64)
+	tenant := os.Getenv("TENANT")
 
 	// Create a Magister instance, give it all the data it needs
 	magister, err := NewMagister(accessToken, refreshToken, accessTokenExpires, tenant)
@@ -36,7 +33,7 @@ func TestMagisterGo(t *testing.T) {
 		t.Error(err.Error())
 	}
 
-	// Get today's appointments
+	// Get appointments of one day
 	_, err = magister.GetAppointments("2021-05-25", "2021-05-25")
 	if err != nil {
 		t.Failed()
