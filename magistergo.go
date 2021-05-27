@@ -19,31 +19,31 @@ func NewMagister(accessToken string, refreshToken string, accessTokenExpiresAt i
 		Timeout: time.Second * 10,
 	}
 
-		// Get the endpoints
-		err := func() error {
-			endpointsUrl := magister.Authority + "/.well-known/openid-configuration"
-			res, err := http.Get(endpointsUrl)
-			defer res.Body.Close()
+	// Get the endpoints
+	err := func() error {
+		endpointsUrl := magister.Authority + "/.well-known/openid-configuration"
+		res, err := http.Get(endpointsUrl)
+		defer res.Body.Close()
 
-			if err != nil {
-				fmt.Errorf(err.Error())
-				return err
-			}
-
-			endpointsBytes, err := ioutil.ReadAll(res.Body)
-			if err != nil {
-				return err
-			}
-
-			err = json.Unmarshal(endpointsBytes, &magister.Endpoints)
-			if err != nil {
-				return err
-			}
-			return nil
-		}()
 		if err != nil {
-			return magister, err
+			fmt.Errorf(err.Error())
+			return err
 		}
+
+		endpointsBytes, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			return err
+		}
+
+		err = json.Unmarshal(endpointsBytes, &magister.Endpoints)
+		if err != nil {
+			return err
+		}
+		return nil
+	}()
+	if err != nil {
+		return magister, err
+	}
 
 	magister.AccessToken = accessToken
 	magister.RefreshToken = refreshToken
@@ -60,10 +60,10 @@ func NewMagister(accessToken string, refreshToken string, accessTokenExpiresAt i
 
 		r, err := http.NewRequest(http.MethodGet, url, nil) // URL-encoded payload
 		if err != nil {
-			return  err
+			return err
 		}
 
-		r.Header.Add("authorization", "Bearer " + magister.AccessToken)
+		r.Header.Add("authorization", "Bearer "+magister.AccessToken)
 
 		resp, err := magister.HTTPClient.Do(r)
 		if err != nil {
@@ -90,9 +90,9 @@ func NewMagister(accessToken string, refreshToken string, accessTokenExpiresAt i
 
 // CheckSession checks if the session has expired
 func (m *Magister) CheckSession() error {
-	//if time.Now().Unix() > m.AccessTokenExpiresAt {
+	// if time.Now().Unix() > m.AccessTokenExpiresAt {
 	//	return errors.New("your access token has expired")
-	//}
+	// }
 
 	return nil
 }
