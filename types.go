@@ -3,18 +3,17 @@ package magistergo
 import "net/http"
 
 type Magister_I interface {
-
 }
 
 type Magister struct {
-	Tenant string
-	AccessToken string
-	RefreshToken string
+	Tenant               string
+	AccessToken          string
+	RefreshToken         string
 	AccessTokenExpiresAt int64
-	Authority string
-	Endpoints Endpoints
-	//ClientID string
-	UserID string
+	Authority            string
+	Endpoints            Endpoints
+	// ClientID string
+	UserID     string
 	HTTPClient http.Client
 }
 
@@ -26,7 +25,7 @@ type AccountData struct {
 	Persoon Persoon `json:"Persoon"`
 }
 
-//type Magister struct {
+// type Magister struct {
 //	School string
 //	Username string
 //	Password string
@@ -43,7 +42,7 @@ type AccountData struct {
 //	Endpoints Endpoints
 //	HTTPClient http.Client
 //	//CookieJar *cookiejar.Jar
-//}
+// }
 
 // Endpoints contains all the information about the Magister endpoints (I guess)
 type Endpoints struct {
@@ -78,8 +77,8 @@ type LoginOptions struct {
 }
 
 type RefreshAccessTokenResponse struct {
-	AccessToken string `json:"access_token"`
+	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
-	expiresIn int64 `json:"expires_in"`
-	ExpiresAt int64
+	expiresIn    int64  `json:"expires_in"`
+	ExpiresAt    int64
 }

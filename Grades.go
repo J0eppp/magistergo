@@ -3,7 +3,6 @@ package magistergo
 import (
 	jsonitor "github.com/json-iterator/go"
 	"io"
-	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -163,7 +162,6 @@ func (m *Magister) GetGrades() ([]Grade, error) {
 
 	gradingPeriods, err := m.unmarshalGradingPeriods(resp.Body)
 	lastGradingPeriod := gradingPeriods[0]
-	log.Println(lastGradingPeriod.ID)
 
 	url = "https://" + m.Tenant + "/api/personen/" + m.UserID + "/aanmeldingen/" + strconv.FormatInt(int64(lastGradingPeriod.ID), 10) + "/cijfers/cijferoverzichtvooraanmelding?actievePerioden=true&alleenBerekendeKolommen=false&alleenPTAKolommen=false"
 

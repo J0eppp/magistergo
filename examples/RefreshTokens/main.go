@@ -9,7 +9,8 @@ import (
 )
 
 func main() {
-	godotenv.Load("../../.env")
+	// Get all the tokens and info from the environment variable
+	godotenv.Load(".env")
 	expires, err := strconv.ParseInt(os.Getenv("EXPIRES"), 10, 64)
 	if err != nil {
 		panic(err)
@@ -20,8 +21,10 @@ func main() {
 		panic(err)
 	}
 
-	err = gocron.Every(50).Minute().Do(magister.RefreshAccessToken())
+	// Refresh the access token every 50 minutes
+	err = gocron.Every(50).Minute().Do(magister.RefreshAccessToken)
 	if err != nil {
 		panic(err)
 	}
+	<- gocron.Start()
 }

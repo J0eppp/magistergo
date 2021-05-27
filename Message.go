@@ -8,10 +8,10 @@ import (
 )
 
 type MessageInfo struct {
-	ID        int64  `json:"id"`
-	Subject	  string `json:"onderwerp"`
-	MapID     int    `json:"mapId"`
-	Sender    struct {
+	ID      int64  `json:"id"`
+	Subject string `json:"onderwerp"`
+	MapID   int    `json:"mapId"`
+	Sender  struct {
 		ID    int    `json:"id"`
 		Name  string `json:"naam"`
 		Links struct {
@@ -20,13 +20,13 @@ type MessageInfo struct {
 			} `json:"self"`
 		} `json:"links"`
 	} `json:"afzender"`
-	HasPriority		bool        `json:"heeftPrioriteit"`
-	HasAttachments  bool        `json:"heeftBijlagen"`
-	IsRead       	bool        `json:"isGelezen"`
-	SentAt		    time.Time   `json:"verzondenOp"`
-	ForwaredAt		interface{} `json:"doorgestuurdOp"`
-	RepliedAt	    interface{} `json:"beantwoordOp"`
-	Links           struct {
+	HasPriority    bool        `json:"heeftPrioriteit"`
+	HasAttachments bool        `json:"heeftBijlagen"`
+	IsRead         bool        `json:"isGelezen"`
+	SentAt         time.Time   `json:"verzondenOp"`
+	ForwaredAt     interface{} `json:"doorgestuurdOp"`
+	RepliedAt      interface{} `json:"beantwoordOp"`
+	Links          struct {
 		Self struct {
 			Href string `json:"href"`
 		} `json:"self"`
@@ -36,7 +36,7 @@ type MessageInfo struct {
 	} `json:"links"`
 }
 
-func (m *Magister) GetMessages(amountOfMessages uint64, skip... uint64) ([]MessageInfo, error) {
+func (m *Magister) GetMessages(amountOfMessages uint64, skip ...uint64) ([]MessageInfo, error) {
 	var messages []MessageInfo
 	var skipMessages uint64
 
@@ -50,14 +50,14 @@ func (m *Magister) GetMessages(amountOfMessages uint64, skip... uint64) ([]Messa
 		skipMessages = skip[0]
 	}
 
-	url := "https://" + m.Tenant + "/api/berichten/postvakin/berichten?top=" + strconv.FormatUint(amountOfMessages + skipMessages, 10) + "&skip=" + strconv.FormatUint(skipMessages, 10)
+	url := "https://" + m.Tenant + "/api/berichten/postvakin/berichten?top=" + strconv.FormatUint(amountOfMessages+skipMessages, 10) + "&skip=" + strconv.FormatUint(skipMessages, 10)
 
 	r, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return messages, err
 	}
 
-	r.Header.Add("authorization", "Bearer " + m.AccessToken)
+	r.Header.Add("authorization", "Bearer "+m.AccessToken)
 
 	resp, err := m.HTTPClient.Do(r)
 	if err != nil {
@@ -66,7 +66,7 @@ func (m *Magister) GetMessages(amountOfMessages uint64, skip... uint64) ([]Messa
 
 	defer resp.Body.Close()
 
-	temp := struct{
+	temp := struct {
 		Items []MessageInfo `json:"items"`
 	}{}
 
@@ -81,24 +81,24 @@ func (m *Magister) GetMessages(amountOfMessages uint64, skip... uint64) ([]Messa
 }
 
 type Message struct {
-	Content     string `json:"inhoud"`
+	Content   string `json:"inhoud"`
 	Receivers []struct {
-		ID           int    `json:"id"`
-		DisplayName	 string `json:"weergavenaam"`
-		Type         string `json:"type"`
-		IsToParent   bool   `json:"isAanOuder"`
-		Links        struct {
+		ID          int    `json:"id"`
+		DisplayName string `json:"weergavenaam"`
+		Type        string `json:"type"`
+		IsToParent  bool   `json:"isAanOuder"`
+		Links       struct {
 			Self struct {
 				Href string `json:"href"`
 			} `json:"self"`
 		} `json:"links"`
 	} `json:"ontvangers"`
-	CopyReceivers         []interface{} `json:"kopieOntvangers"`
-	BlindCopyReceivers	  []interface{} `json:"blindeKopieOntvangers"`
-	ID                    int           `json:"id"`
-	Subject	              string        `json:"onderwerp"`
-	MapID                 int           `json:"mapId"`
-	Sender              struct {
+	CopyReceivers      []interface{} `json:"kopieOntvangers"`
+	BlindCopyReceivers []interface{} `json:"blindeKopieOntvangers"`
+	ID                 int           `json:"id"`
+	Subject            string        `json:"onderwerp"`
+	MapID              int           `json:"mapId"`
+	Sender             struct {
 		ID    int    `json:"id"`
 		Name  string `json:"naam"`
 		Links struct {
@@ -107,13 +107,13 @@ type Message struct {
 			} `json:"self"`
 		} `json:"links"`
 	} `json:"afzender"`
-	HasPriority		bool        `json:"heeftPrioriteit"`
-	HasAttachments  bool        `json:"heeftBijlagen"`
-	Isread	        bool        `json:"isGelezen"`
-	SentAt		    time.Time   `json:"verzondenOp"`
-	ForwardedAt	  	interface{} `json:"doorgestuurdOp"`
-	RepliedAt	    interface{} `json:"beantwoordOp"`
-	Links           struct {
+	HasPriority    bool        `json:"heeftPrioriteit"`
+	HasAttachments bool        `json:"heeftBijlagen"`
+	Isread         bool        `json:"isGelezen"`
+	SentAt         time.Time   `json:"verzondenOp"`
+	ForwardedAt    interface{} `json:"doorgestuurdOp"`
+	RepliedAt      interface{} `json:"beantwoordOp"`
+	Links          struct {
 		Self struct {
 			Href string `json:"href"`
 		} `json:"self"`
@@ -140,7 +140,7 @@ func (m *Magister) GetMessage(messageID int64) (Message, error) {
 		return message, err
 	}
 
-	r.Header.Add("authorization", "Bearer " + m.AccessToken)
+	r.Header.Add("authorization", "Bearer "+m.AccessToken)
 
 	resp, err := m.HTTPClient.Do(r)
 	if err != nil {
