@@ -32,11 +32,12 @@ func TestMagisterGo(t *testing.T) {
 		t.Error(err.Error())
 	}
 
-	_, err = magister.GetAppointments()
+	appointments, err := magister.GetAppointments()
 	if err != nil {
 		t.Failed()
 		t.Error(err.Error())
 	}
+	t.Log(appointments[0].Description)
 
 	// Get appointments of one day
 	_, err = magister.GetAppointments("2021-05-25", "2021-05-25")
@@ -52,10 +53,6 @@ func TestMagisterGo(t *testing.T) {
 		t.Error(err)
 	}
 
-	//for _, message := range messages {
-	//	t.Logf("%+v\n", message)
-	//}
-
 	// Get the content of the last received message
 	msgID := messages[0].ID
 	_, err = magister.GetMessage(msgID)
@@ -65,11 +62,10 @@ func TestMagisterGo(t *testing.T) {
 	}
 
 	// Get the grades
-	grades, err := magister.GetGrades()
+	_, err = magister.GetGrades()
 	if err != nil {
 		t.Failed()
 		t.Error(err)
 	}
-	t.Logf("%+v\n", grades[0])
 }
 

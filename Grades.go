@@ -97,10 +97,10 @@ type GradingPeriod struct {
 			} `magisterjson:"self" json:"self"`
 		} `magisterjson:"links" json:"links"`
 	} `magisterjson:"persoonlijkeMentor" json:"personalMentor"`
-	Start             string `magisterjson:"begin" json:"start"`
-	End             string `magisterjson:"einde" json:"end"`
+	Start              string `magisterjson:"begin" json:"start"`
+	End                string `magisterjson:"einde" json:"end"`
 	IsMainRegistration bool   `magisterjson:"isHoofdAanmelding" json:"isMainRegistration"`
-	Links             struct {
+	Links              struct {
 		Self struct {
 			Href string `magisterjson:"href" json:"href"`
 		} `magisterjson:"self" json:"self"`
@@ -136,7 +136,6 @@ func (m *Magister) unmarshalGradingPeriods(_gradingPeriods io.Reader) ([]Grading
 	return gradingPeriods, err
 }
 
-
 func (m *Magister) GetGrades() ([]Grade, error) {
 	var grades []Grade
 
@@ -166,7 +165,6 @@ func (m *Magister) GetGrades() ([]Grade, error) {
 	lastGradingPeriod := gradingPeriods[0]
 	log.Println(lastGradingPeriod.ID)
 
-
 	url = "https://" + m.Tenant + "/api/personen/" + m.UserID + "/aanmeldingen/" + strconv.FormatInt(int64(lastGradingPeriod.ID), 10) + "/cijfers/cijferoverzichtvooraanmelding?actievePerioden=true&alleenBerekendeKolommen=false&alleenPTAKolommen=false"
 
 	r, err = http.NewRequest("GET", url, nil)
@@ -192,7 +190,6 @@ func (m *Magister) GetGrades() ([]Grade, error) {
 	return grades, nil
 }
 
-// Todo: test this method
 // https://stackoverflow.com/questions/38809137/golang-multiple-json-tag-names-for-one-field
 func (m *Magister) unmarshalGrades(_grades io.Reader) ([]Grade, error) {
 	var grades []Grade

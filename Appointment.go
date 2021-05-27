@@ -1,7 +1,8 @@
 package magistergo
 
 import (
-	"encoding/json"
+	jsonitor "github.com/json-iterator/go"
+	"io"
 	"net/http"
 )
 
@@ -24,34 +25,35 @@ type Classroom struct {
 
 // Appointment contains all the info about an appointment
 type Appointment struct {
-	ID int64 `json:"Id"`
+	ID int64 `magisterjson:"Id" json:"id"`
 	// Skip "Links", is that interesting to know?
-	Start string `json:"Start"`
-	End string `json:"Einde"`
-	StartHour int8 `json:"LesuurVan"`
-	EndHour int8 `json:"LesuurTotMet"`
-	TakesWholeDay bool `json:"DuurtHeleDag"`
-	Description string `json:"Omschrijving"`
-	Location string `json:"Locatie"`
-	Status int64 `json:"Status"`
-	Type int64 `json:"Type"`
-	IsOnline bool `json:"IsOnlineDeelname"`
-	DisplayType int64 `json:"WeergaveType"`
-	Content string `json:"Inhoud"`
-	InfoType int64 `json:"InfoType"`
-	Notes string `json:"Aantekeningen"`
-	Finished bool `json:"Afgerond"`
-	RepeatStatus int64 `json:"HerhaalStatus"`
-	Repeat string `json:"Herhaling"`
-	Subjects []Subject `json:"Vakken"`
-	Teachers []Teacher `json:"Docenten"`
-	Classrooms []Classroom `json:"Lokalen"`
-	Groups string `json:"Groepen"`
-	AssignmentID int64 `json:"OpdrachtId"`
-	HasAttachements bool `json:"HeeftBijlagen"`
-	Attachments string `json:"Bijlagen"`
+	Start string `magisterjson:"Start" json:"start"`
+	End string `magisterjson:"Einde" json:"end"`
+	PeriodStarts int8 `magisterjson:"LesuurVan" json:"periodStarts"`
+	PeriodEnds int8 `magisterjson:"LesuurTotMet" json:"periodEnds"`
+	TakesWholeDay bool `magisterjson:"DuurtHeleDag" json:"TakesWholeDay"`
+	Description string `magisterjson:"Omschrijving" json:"description"`
+	Location string `magisterjson:"Locatie" json:"location"`
+	Status int64 `magisterjson:"Status" json:"status"`
+	Type int64 `magisterjson:"Type" json:"type"`
+	IsOnline bool `magisterjson:"IsOnlineDeelname" json:"isOnline"`
+	DisplayType int64 `magisterjson:"WeergaveType" json:"displayType"`
+	Content string `magisterjson:"Inhoud" json:"content"`
+	InfoType int64 `magisterjson:"InfoType" json:"infoType"`
+	Notes string `magisterjson:"Aantekeningen" json:"notes"`
+	Finished bool `magisterjson:"Afgerond" json:"finished"`
+	RepeatStatus int64 `magisterjson:"HerhaalStatus" json:"repeatStatus"`
+	Repeat string `magisterjson:"Herhaling" json:"repeat"`
+	Subjects []Subject `magisterjson:"Vakken" json:"subjects"`
+	Teachers []Teacher `magisterjson:"Docenten" json:"teachers"`
+	Classrooms []Classroom `magisterjson:"Lokalen" json:"classrooms"`
+	Groups string `magisterjson:"Groepen" json:"groups"`
+	AssignmentID int64 `magisterjson:"OpdrachtId" json:"assignmentID"`
+	HasAttachements bool `magisterjson:"HeeftBijlagen" json:"hasAttachments"`
+	Attachments string `magisterjson:"Bijlagen" json:"attachments"`
 }
 
+// GetType returns the type of the appointment as a string
 func (appointment *Appointment) GetType() string {
 	switch appointment.Type {
 	case 0:   return "none" // None
@@ -79,6 +81,7 @@ func (appointment *Appointment) GetType() string {
 	}
 }
 
+// GetInfoType returns the info type of the appointment as a string
 func (appointment *Appointment) GetInfoType() string {
 	switch appointment.InfoType {
 	case 0:  return "none" // None
@@ -94,6 +97,7 @@ func (appointment *Appointment) GetInfoType() string {
 	}
 }
 
+// GetStatus returns the status of the appointment as a string
 func (appointment *Appointment) GetStatus() string {
 	switch appointment.Status {
 	case 0:  return "unknown" // Geen status
@@ -112,6 +116,24 @@ func (appointment *Appointment) GetStatus() string {
 	}
 }
 
+func (m *Magister) unmarshalAppointments(_appointments io.Reader) ([]Appointment, error) {
+	var appointments []Appointment
+
+	temp := struct {
+		Items []Appointment `magisterjson:"Items"`
+	}{}
+
+	JSON := jsonitor.Config{
+		TagKey: "magisterjson",
+	}.Froze()
+
+	err := JSON.NewDecoder(_appointments).Decode(&temp)
+	appointments = temp.Items
+
+	return appointments, err
+}
+
+// GetAppointments fetches the appointment data from Magister and puts it into a []Appointment
 func (m *Magister) GetAppointments(dates... string) ([]Appointment, error) {
 	var appointments []Appointment
 
@@ -125,7 +147,6 @@ func (m *Magister) GetAppointments(dates... string) ([]Appointment, error) {
 	} else {
 		url = "https://" + m.Tenant + "/api/personen/" + m.UserID + "/afspraken"
 	}
-
 
 	r, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -141,16 +162,10 @@ func (m *Magister) GetAppointments(dates... string) ([]Appointment, error) {
 
 	defer resp.Body.Close()
 
-	temp := struct{
-		Items []Appointment `json:"Items"`
-	}{}
-
-	err = json.NewDecoder(resp.Body).Decode(&temp)
+	appointments, err = m.unmarshalAppointments(resp.Body)
 	if err != nil {
 		return appointments, err
 	}
-
-	appointments = temp.Items
 
 	return appointments, nil
 }
