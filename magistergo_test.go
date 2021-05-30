@@ -96,4 +96,14 @@ func TestMagisterGo(t *testing.T) {
 	} else {
 		t.Log("Fetched assignments!")
 	}
+
+	// Get absences
+	t.Log("Fetching absences...")
+	_, err = magister.GetAbsences()
+	if err != nil {
+		t.Failed()
+		t.Error(err)
+	} else {
+		t.Log("Fetched absences!")
+	}
 }
