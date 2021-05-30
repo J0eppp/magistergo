@@ -2,9 +2,6 @@ package magistergo
 
 import "net/http"
 
-type Magister_I interface {
-}
-
 type Magister struct {
 	Tenant               string
 	AccessToken          string
